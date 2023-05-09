@@ -1,1 +1,53 @@
+# Informações Mestre Álvaro
+meta_alvaro = float(input("Informe a meta do Mestre Álvaro: R$ "))
+venda_bruta_alvaro = float(input("Informe a venda bruta do Mestre Álvaro: R$ "))
+venda_liquida_alvaro = venda_bruta_alvaro * 0.93
+clientes_alvaro = int(input("Informe a quantidade de clientes do Mestre Álvaro: "))
+tm_alvaro = venda_liquida_alvaro / clientes_alvaro
+
+# Informações Meta Premium
+meta_premium = float(input("Informe a meta Premium: "))
+real_premium = float(input("Informe o valor vendido no Premium: "))
+
+# Informações KSK
+venda_bruta_ksk = float(input("Informe a venda bruta da KSK: R$ "))
+venda_liquida_ksk = venda_bruta_ksk * 0.93
+clientes_ksk = int(input("Informe a quantidade de clientes da KSK: "))
+tm_ksk = venda_liquida_ksk / clientes_ksk
+
+# Informações Totais
+venda_bruta_total = venda_bruta_alvaro + venda_bruta_ksk
+venda_liquida_total = venda_liquida_alvaro + venda_liquida_ksk
+
+# Relatório
+relatorio = f"""
+🔰 *Mestre Álvaro* 🔰
+
+🎯 *Meta:* R$ {meta_alvaro:.2f}
+
+💲 *Venda Bruta:* R$ {venda_bruta_alvaro:.2f}
+💲 *Venda Líquida:* R$ {venda_liquida_alvaro:.2f}
+
+👥️️ *Clientes:* {clientes_alvaro}
+💰 *TM:* R$ {tm_alvaro:.2f} 💸
+
+🍔 *Meta Premium:* {meta_premium:.0f}
+🔵 *Real Premium:* {real_premium:.0f}
+
+🍦 *KSK 🍦*
+
+💲 *Venda Bruta:* R$ {venda_bruta_ksk:.2f}
+💲 *Venda Líquida:* R$ {venda_liquida_ksk:.2f}
+
+👥️️ *Clientes:* {clientes_ksk}
+💰 *TM:* R$ {tm_ksk:.2f} 💸
+
+💲 *Venda Bruta Total:* R$ {venda_bruta_total:.2f}
+💲 *Venda Líquida Total:* R$ {venda_liquida_total:.2f}
+
+⚠️ *Meta não cumprida!* 📉
+Vamos buscar vendas para alcançá-la.
+"""
+
+print(relatorio)
 
