@@ -40,11 +40,24 @@ install_system_dependencies() {
   pkg install -y curl git
 }
 
+# Função para baixar o arquivo leandrus.js
+download_leandrus() {
+  echo "Baixando o arquivo leandrus.js..."
+  if ! curl -o $INSTALL_DIR/$MAIN_JS $JS_URL; then
+    echo "Erro: Falha ao baixar o arquivo leandrus.js."
+    echo "Por favor, verifique sua conexão com a internet e tente novamente."
+    exit 1
+  fi
+}
+
 # Função para instalar dependências do Google Gemini
 install_gemini_dependencies() {
   echo "Instalando dependências do Google Gemini..."
   cd $INSTALL_DIR
-  npm install @google/generative-ai fs path os readline express
+  if ! npm install @google/generative-ai fs path os readline express; then
+    echo "Erro: Falha ao instalar as dependências."
+    exit 1
+  fi
 }
 
 # Função para configurar o comando 'play'
@@ -75,23 +88,10 @@ main() {
   install_nodejs
 
   # Baixar o arquivo leandrus.js
-  echo "Baixando o arquivo leandrus.js..."
-  curl -o $INSTALL_DIR/$MAIN_JS $JS_URL
-
-  # Verificar se o download foi bem-sucedido
-  if [ ! -f "$INSTALL_DIR/$MAIN_JS" ]; then
-    echo "Erro: Falha ao baixar o arquivo leandrus.js."
-    exit 1
-  fi
+  download_leandrus
 
   # Instalar dependências do Google Gemini
   install_gemini_dependencies
-
-  # Verificar se as dependências foram instaladas corretamente
-  if [ $? -ne 0 ]; then
-    echo "Erro: Falha ao instalar as dependências."
-    exit 1
-  fi
 
   # Configurar o comando 'play'
   setup_play_command
