@@ -9,6 +9,16 @@ JS_URL="https://raw.githubusercontent.com/leandoo/bot/refs/heads/main/leandrus.j
 # Diretório de instalação
 INSTALL_DIR="/usr/local/bin/leandrus"
 
+# Função para atualizar o sistema e fazer upgrade dos pacotes
+update_system() {
+  echo "Atualizando o sistema e fazendo upgrade dos pacotes..."
+  sudo apt-get update -y
+  sudo apt-get upgrade -y
+  sudo apt-get autoremove -y
+  sudo apt-get autoclean -y
+  echo "Sistema atualizado com sucesso!"
+}
+
 # Função para verificar e instalar Node.js e npm
 install_nodejs() {
   if ! command -v node &> /dev/null; then
@@ -31,7 +41,6 @@ install_nodejs() {
 # Função para instalar dependências do sistema (caso necessário)
 install_system_dependencies() {
   echo "Instalando dependências do sistema..."
-  sudo apt-get update
   sudo apt-get install -y curl git build-essential
 }
 
@@ -45,12 +54,20 @@ install_gemini_dependencies() {
 # Função para configurar o comando 'play'
 setup_play_command() {
   echo "Configurando o comando 'play'..."
-  sudo ln -sf $INSTALL_DIR/$MAIN_JS /usr/local/bin/play
+  # Cria um wrapper script para executar o arquivo JS com Node.js
+  sudo bash -c "cat > /usr/local/bin/play << 'EOF'
+#!/bin/bash
+node $INSTALL_DIR/$MAIN_JS
+EOF"
+  sudo chmod +x /usr/local/bin/play
   sudo chmod +x $INSTALL_DIR/$MAIN_JS
 }
 
 # Função principal de instalação
 main() {
+  # Atualizar o sistema e fazer upgrade dos pacotes
+  update_system
+
   # Criar diretório de instalação
   echo "Criando diretório de instalação..."
   sudo mkdir -p $INSTALL_DIR
