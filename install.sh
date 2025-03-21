@@ -1,4 +1,5 @@
-#!/bin/bash
+incipal
+main#!/bin/bash
 
 # Nome do arquivo JS principal
 MAIN_JS="leandrus.js"
@@ -7,15 +8,13 @@ MAIN_JS="leandrus.js"
 JS_URL="https://raw.githubusercontent.com/leandoo/bot/refs/heads/main/leandrus.js"
 
 # Diretório de instalação
-INSTALL_DIR="/usr/local/bin/leandrus"
+INSTALL_DIR="$HOME/leandrus"
 
 # Função para atualizar o sistema e fazer upgrade dos pacotes
 update_system() {
   echo "Atualizando o sistema e fazendo upgrade dos pacotes..."
-  sudo apt-get update -y
-  sudo apt-get upgrade -y
-  sudo apt-get autoremove -y
-  sudo apt-get autoclean -y
+  pkg update -y
+  pkg upgrade -y
   echo "Sistema atualizado com sucesso!"
 }
 
@@ -23,16 +22,14 @@ update_system() {
 install_nodejs() {
   if ! command -v node &> /dev/null; then
     echo "Node.js não encontrado. Instalando Node.js e npm..."
-    # Adiciona o repositório do NodeSource para Node.js 18.x
-    curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-    sudo apt-get install -y nodejs
+    pkg install -y nodejs
   else
     echo "Node.js já está instalado."
   fi
 
   if ! command -v npm &> /dev/null; then
     echo "npm não encontrado. Instalando npm..."
-    sudo apt-get install -y npm
+    pkg install -y npm
   else
     echo "npm já está instalado."
   fi
@@ -41,7 +38,7 @@ install_nodejs() {
 # Função para instalar dependências do sistema (caso necessário)
 install_system_dependencies() {
   echo "Instalando dependências do sistema..."
-  sudo apt-get install -y curl git build-essential
+  pkg install -y curl git
 }
 
 # Função para instalar dependências do Google Gemini
@@ -55,12 +52,12 @@ install_gemini_dependencies() {
 setup_play_command() {
   echo "Configurando o comando 'play'..."
   # Cria um wrapper script para executar o arquivo JS com Node.js
-  sudo bash -c "cat > /usr/local/bin/play << 'EOF'
+  cat > $PREFIX/bin/play <<EOF
 #!/bin/bash
 node $INSTALL_DIR/$MAIN_JS
-EOF"
-  sudo chmod +x /usr/local/bin/play
-  sudo chmod +x $INSTALL_DIR/$MAIN_JS
+EOF
+  chmod +x $PREFIX/bin/play
+  chmod +x $INSTALL_DIR/$MAIN_JS
 }
 
 # Função principal de instalação
@@ -70,7 +67,7 @@ main() {
 
   # Criar diretório de instalação
   echo "Criando diretório de instalação..."
-  sudo mkdir -p $INSTALL_DIR
+  mkdir -p $INSTALL_DIR
 
   # Instalar dependências do sistema
   install_system_dependencies
@@ -80,7 +77,7 @@ main() {
 
   # Baixar o arquivo leandrus.js
   echo "Baixando o arquivo leandrus.js..."
-  sudo curl -o $INSTALL_DIR/$MAIN_JS $JS_URL
+  curl -o $INSTALL_DIR/$MAIN_JS $JS_URL
 
   # Verificar se o download foi bem-sucedido
   if [ ! -f "$INSTALL_DIR/$MAIN_JS" ]; then
