@@ -1,5 +1,4 @@
-incipal
-main#!/bin/bash
+#!/bin/bash
 
 # Nome do arquivo JS principal
 MAIN_JS="leandrus.js"
@@ -21,7 +20,7 @@ update_system() {
 # Função para verificar e instalar Node.js e npm
 install_nodejs() {
   if ! command -v node &> /dev/null; then
-    echo "Node.js não encontrado. Instalando Node.js e npm..."
+    echo "Node.js não encontrado. Instalando Node.js..."
     pkg install -y nodejs
   else
     echo "Node.js já está instalado."
