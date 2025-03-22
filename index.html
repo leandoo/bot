@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leandrus - Histórico de Conversas</title>
+    <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #1e1e2f;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: #2a2a40;
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #ff6f61;
+        }
+
+        p {
+            font-size: 14px;
+            margin-bottom: 20px;
+            color: #a0a0a0;
+        }
+
+        .file-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .file-button {
+            background-color: #3a3a5a;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            color: #ffffff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-align: left;
+        }
+
+        .file-button:hover {
+            background-color: #4a4a6a;
+        }
+
+        .file-button:active {
+            background-color: #2a2a40;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Histórico de Conversas</h1>
+        <p>Aqui estão todas as suas conversas salvas. Clique em um botão para baixar o arquivo.</p>
+        <div id="file-list" class="file-list">
+            <!-- Os botões dos arquivos serão gerados aqui -->
+        </div>
+    </div>
+    <script>
+        // Função para carregar a lista de arquivos TXT
+        function loadFileList() {
+            fetch("/files")
+                .then(response => response.json())
+                .then(files => {
+                    const fileList = document.getElementById("file-list");
+                    fileList.innerHTML = ""; // Limpa a lista
+
+                    files.forEach(file => {
+                        const button = document.createElement("button");
+                        button.className = "file-button";
+                        button.textContent = file;
+                        button.onclick = () => window.location.href = `/download/${file}`;
+                        fileList.appendChild(button);
+                    });
+                })
+                .catch(error => console.error("Erro ao carregar arquivos:", error));
+        }
+
+        // Carrega a lista de arquivos ao abrir a página
+        window.onload = loadFileList;
+    </script>
+</body>
+</html>
