@@ -24,23 +24,24 @@ if [ -d "$BOT_DIR" ]; then
     rm -rf "$BOT_DIR"
 fi
 
-# Cria o diretório do bot
+# Baixa o código do bot do seu repositório
+echo "⬇️ Baixando o Leandrus..."
 mkdir -p "$BOT_DIR"
 cd "$BOT_DIR"
+curl -o leandrus.js -L "https://raw.githubusercontent.com/leandoo/bot/main/leandrus.js"
 
-# Baixa o código do bot
-echo "⬇️ Baixando o Leandrus..."
-curl -o leandrus.cjs -L "https://raw.githubusercontent.com/leandoo/bot/main/leandrus.cjs"
+# Cria o package.json com "type": "commonjs" para evitar erro de importação
+echo '{ "type": "commonjs" }' > package.json
 
 # Instala dependências do projeto
 echo "📦 Instalando dependências do Leandrus..."
-npm install
+npm install express
 
 # Cria o comando 'play' para executar o bot facilmente
 echo "⚙️ Configurando comando de execução..."
 PLAY_CMD="$PREFIX/bin/play"
 echo '#!/data/data/com.termux/files/usr/bin/sh' > "$PLAY_CMD"
-echo "cd $BOT_DIR && node leandrus.cjs" >> "$PLAY_CMD"
+echo "cd $BOT_DIR && node leandrus.js" >> "$PLAY_CMD"
 chmod +x "$PLAY_CMD"
 
 echo "✅ Instalação concluída! Execute o bot com: play"
