@@ -9,95 +9,59 @@ JS_URL="https://raw.githubusercontent.com/leandoo/bot/refs/heads/main/leandrus.j
 # Diretório de instalação
 INSTALL_DIR="$HOME/leandrus"
 
-# Função para atualizar o sistema e fazer upgrade dos pacotes
+# Atualiza o sistema
 update_system() {
-  echo "Atualizando o sistema e fazendo upgrade dos pacotes..."
-  pkg update -y
-  pkg upgrade -y
-  echo "Sistema atualizado com sucesso!"
+  echo "🔄 Atualizando sistema..."
+  apt update -y && apt upgrade -y
 }
 
-# Função para verificar e instalar Node.js e npm
+# Instala Node.js e npm
 install_nodejs() {
   if ! command -v node &> /dev/null; then
-    echo "Node.js não encontrado. Instalando Node.js..."
-    pkg install -y nodejs
+    echo "⚙️ Instalando Node.js..."
+    apt install -y nodejs npm
   else
-    echo "Node.js já está instalado."
-  fi
-
-  if ! command -v npm &> /dev/null; then
-    echo "npm não encontrado. Instalando npm..."
-    pkg install -y npm
-  else
-    echo "npm já está instalado."
+    echo "✅ Node.js já instalado!"
   fi
 }
 
-# Função para instalar dependências do sistema (caso necessário)
-install_system_dependencies() {
-  echo "Instalando dependências do sistema..."
-  pkg install -y curl git
+# Instala dependências do sistema
+install_dependencies() {
+  echo "🔧 Instalando pacotes essenciais..."
+  apt install -y curl git
 }
 
-# Função para baixar o arquivo leandrus.js
+# Baixa o Leandrus.js
 download_leandrus() {
-  echo "Baixando o arquivo leandrus.js..."
-  if ! curl -o $INSTALL_DIR/$MAIN_JS $JS_URL; then
-    echo "Erro: Falha ao baixar o arquivo leandrus.js."
-    echo "Por favor, verifique sua conexão com a internet e tente novamente."
-    exit 1
-  fi
-}
-
-# Função para instalar dependências do Google Gemini
-install_gemini_dependencies() {
-  echo "Instalando dependências do Google Gemini..."
-  cd $INSTALL_DIR
-  if ! npm install @google/generative-ai fs path os readline express cors; then
-    echo "Erro: Falha ao instalar as dependências."
-    exit 1
-  fi
-}
-
-# Função para configurar o comando 'play'
-setup_play_command() {
-  echo "Configurando o comando 'play'..."
-  # Cria um wrapper script para executar o arquivo JS com Node.js
-  cat > $PREFIX/bin/play <<EOF
-#!/bin/bash
-node $INSTALL_DIR/$MAIN_JS
-EOF
-  chmod +x $PREFIX/bin/play
-  chmod +x $INSTALL_DIR/$MAIN_JS
-}
-
-# Função principal de instalação
-main() {
-  # Atualizar o sistema e fazer upgrade dos pacotes
-  update_system
-
-  # Criar diretório de instalação
-  echo "Criando diretório de instalação..."
+  echo "📥 Baixando o Leandrus..."
   mkdir -p $INSTALL_DIR
-
-  # Instalar dependências do sistema
-  install_system_dependencies
-
-  # Verificar e instalar Node.js e npm
-  install_nodejs
-
-  # Baixar o arquivo leandrus.js
-  download_leandrus
-
-  # Instalar dependências do Google Gemini
-  install_gemini_dependencies
-
-  # Configurar o comando 'play'
-  setup_play_command
-
-  echo "Instalação concluída! Agora você pode executar o Leandrus com o comando 'play'."
+  curl -o $INSTALL_DIR/$MAIN_JS $JS_URL
 }
 
-# Executar a função principal
+# Instala dependências do bot
+install_bot_dependencies() {
+  echo "📦 Instalando dependências do bot..."
+  cd $INSTALL_DIR
+  npm install @google/generative-ai fs path os readline express cors
+}
+
+# Configura o comando 'play'
+setup_play_command() {
+  echo "🎮 Criando comando 'play'..."
+  echo "#!/bin/bash" > $PREFIX/bin/play
+  echo "node $INSTALL_DIR/$MAIN_JS" >> $PREFIX/bin/play
+  chmod +x $PREFIX/bin/play
+}
+
+# Executa a instalação
+main() {
+  update_system
+  install_nodejs
+  install_dependencies
+  download_leandrus
+  install_bot_dependencies
+  setup_play_command
+  echo "✅ Instalação concluída! Use 'play' para rodar o bot."
+}
+
 main
