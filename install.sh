@@ -54,18 +54,18 @@ download_files() {
     echo "Arquivos baixados com sucesso!"
 }
 
-# Função para criar o comando "play"
-create_play_command() {
-    echo "Configurando o comando 'play'..."
+# Função para criar o comando "startbot"
+create_startbot_command() {
+    echo "Configurando o comando 'startbot'..."
 
     # Adiciona o alias ao arquivo de configuração do shell
     if [[ -f "$HOME/.bashrc" ]]; then
-        echo "alias play='cd $BASE_DIR && node leandrus.js'" >> "$HOME/.bashrc"
+        echo "alias startbot='cd $BASE_DIR && node leandrus.js'" >> "$HOME/.bashrc"
     elif [[ -f "$HOME/.zshrc" ]]; then
-        echo "alias play='cd $BASE_DIR && node leandrus.js'" >> "$HOME/.zshrc"
+        echo "alias startbot='cd $BASE_DIR && node leandrus.js'" >> "$HOME/.zshrc"
     else
         echo "Nenhum arquivo de configuração do shell encontrado. Criando ~/.bashrc..."
-        echo "alias play='cd $BASE_DIR && node leandrus.js'" > "$HOME/.bashrc"
+        echo "alias startbot='cd $BASE_DIR && node leandrus.js'" > "$HOME/.bashrc"
     fi
 
     # Recarrega o shell para aplicar o alias
@@ -75,7 +75,7 @@ create_play_command() {
         source "$HOME/.zshrc"
     fi
 
-    echo "Comando 'play' configurado com sucesso!"
+    echo "Comando 'startbot' configurado com sucesso!"
 }
 
 # Função principal
@@ -88,12 +88,12 @@ main() {
     # Baixa arquivos
     download_files
 
-    # Configura o comando "play"
-    create_play_command
+    # Configura o comando "startbot"
+    create_startbot_command
 
     echo "Instalação concluída com sucesso!"
     echo "Para iniciar o bot, digite:"
-    echo "play"
+    echo "startbot"
 }
 
 # Executa a função principal
