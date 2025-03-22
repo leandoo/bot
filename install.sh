@@ -1,104 +1,93 @@
-// instalador.js
-const fs = require("fs");
-const path = require("path");
-const { exec } = require("child_process");
-const https = require("https");
+#!/bin/bash
 
-// URLs dos arquivos raw
-const HTML_URL = "https://raw.githubusercontent.com/leandoo/bot/refs/heads/main/index.html";
-const SERVER_URL = "https://raw.githubusercontent.com/leandoo/bot/refs/heads/main/leandrus.js";
+# Nome do arquivo do bot
+BOT_FILE="leandrus.js"
+HTML_URL="https://raw.githubusercontent.com/leandoo/bot/refs/heads/main/index.html"
+BOT_URL="https://raw.githubusercontent.com/leandoo/bot/refs/heads/main/leandrus.js"
 
-// Diretórios
-const BASE_DIR = path.join(__dirname, "Leandrus");
-const PUBLIC_DIR = path.join(BASE_DIR, "public");
-const HTML_FILE = path.join(PUBLIC_DIR, "index.html");
-const SERVER_FILE = path.join(BASE_DIR, "leandrus.js");
+# Diretório base
+BASE_DIR="$HOME/Leandrus"
+PUBLIC_DIR="$BASE_DIR/public"
+HTML_FILE="$PUBLIC_DIR/index.html"
 
-// Função para baixar arquivos
-function downloadFile(url, destination) {
-    return new Promise((resolve, reject) => {
-        const file = fs.createWriteStream(destination);
-        https.get(url, (response) => {
-            response.pipe(file);
-            file.on("finish", () => {
-                file.close(resolve);
-            });
-        }).on("error", (err) => {
-            fs.unlink(destination, () => reject(err));
-        });
-    });
+# Função para verificar e instalar dependências
+install_dependencies() {
+    echo "Instalando dependências..."
+
+    # Verifica se o Node.js está instalado
+    if ! command -v node &> /dev/null; then
+        echo "Node.js não encontrado. Instalando Node.js..."
+        curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+        sudo apt-get install -y nodejs
+    else
+        echo "Node.js já está instalado."
+    fi
+
+    # Verifica se o npm está instalado
+    if ! command -v npm &> /dev/null; then
+        echo "npm não encontrado. Instalando npm..."
+        sudo apt-get install -y npm
+    else
+        echo "npm já está instalado."
+    fi
+
+    # Instala dependências do projeto
+    echo "Instalando dependências do projeto..."
+    npm install @google/generative-ai express chalk
 }
 
-// Função para instalar dependências
-function installDependencies() {
-    return new Promise((resolve, reject) => {
-        console.log("Instalando dependências...");
-        exec("npm install @google/generative-ai express chalk", (err, stdout, stderr) => {
-            if (err) {
-                console.error("Erro ao instalar dependências:", stderr);
-                reject(err);
-            } else {
-                console.log("Dependências instaladas com sucesso!");
-                resolve();
-            }
-        });
-    });
+# Função para baixar arquivos
+download_files() {
+    echo "Baixando arquivos..."
+
+    # Cria diretórios
+    mkdir -p "$BASE_DIR"
+    mkdir -p "$PUBLIC_DIR"
+
+    # Baixa o arquivo leandrus.js
+    echo "Baixando $BOT_FILE..."
+    curl -sL "$BOT_URL" -o "$BASE_DIR/$BOT_FILE"
+
+    # Baixa o arquivo HTML
+    echo "Baixando index.html..."
+    curl -sL "$HTML_URL" -o "$HTML_FILE"
+
+    echo "Arquivos baixados com sucesso!"
 }
 
-// Função para criar o botão de "Play"
-function createPlayButton() {
-    const playScript = `
-        const { exec } = require("child_process");
-        const readline = require("readline");
+# Função para criar o botão de "Play"
+create_play_button() {
+    echo "Criando botão de 'Play'..."
 
-        const rl = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout,
-        });
+    cat > "$BASE_DIR/play.sh" <<EOF
+#!/bin/bash
 
-        console.log("Pressione ENTER para iniciar o bot...");
-        rl.on("line", () => {
-            console.log("Iniciando o bot...");
-            exec("node leandrus.js", (err, stdout, stderr) => {
-                if (err) {
-                    console.error("Erro ao iniciar o bot:", stderr);
-                } else {
-                    console.log(stdout);
-                }
-            });
-        });
-    `;
+echo "Iniciando o bot..."
+cd "$BASE_DIR"
+node leandrus.js
+EOF
 
-    fs.writeFileSync(path.join(BASE_DIR, "play.js"), playScript, "utf-8");
-    console.log("Botão de 'Play' criado com sucesso!");
+    chmod +x "$BASE_DIR/play.sh"
+    echo "Botão de 'Play' criado com sucesso!"
 }
 
-// Função principal
-async function main() {
-    try {
-        // Cria diretórios
-        if (!fs.existsSync(BASE_DIR)) fs.mkdirSync(BASE_DIR, { recursive: true });
-        if (!fs.existsSync(PUBLIC_DIR)) fs.mkdirSync(PUBLIC_DIR, { recursive: true });
+# Função principal
+main() {
+    echo "Iniciando instalação do Leandrus..."
 
-        // Baixa os arquivos
-        console.log("Baixando arquivos...");
-        await downloadFile(HTML_URL, HTML_FILE);
-        await downloadFile(SERVER_URL, SERVER_FILE);
-        console.log("Arquivos baixados com sucesso!");
+    # Instala dependências
+    install_dependencies
 
-        // Instala dependências
-        await installDependencies();
+    # Baixa arquivos
+    download_files
 
-        // Cria o botão de "Play"
-        createPlayButton();
+    # Cria botão de "Play"
+    create_play_button
 
-        console.log("Instalação concluída com sucesso!");
-        console.log("Execute o comando abaixo para iniciar o bot:");
-        console.log("node play.js");
-    } catch (err) {
-        console.error("Erro durante a instalação:", err);
-    }
+    echo "Instalação concluída com sucesso!"
+    echo "Para iniciar o bot, execute:"
+    echo "cd $BASE_DIR && ./play.sh"
 }
 
-// Executa o instalador
-main();
+# Executa a função principal
+main
