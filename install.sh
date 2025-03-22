@@ -17,8 +17,7 @@ install_dependencies() {
     # Verifica se o Node.js está instalado
     if ! command -v node &> /dev/null; then
         echo "Node.js não encontrado. Instalando Node.js..."
-        curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
-        sudo apt-get install -y nodejs
+        pkg install nodejs -y
     else
         echo "Node.js já está instalado."
     fi
@@ -26,7 +25,7 @@ install_dependencies() {
     # Verifica se o npm está instalado
     if ! command -v npm &> /dev/null; then
         echo "npm não encontrado. Instalando npm..."
-        sudo apt-get install -y npm
+        pkg install npm -y
     else
         echo "npm já está instalado."
     fi
@@ -55,20 +54,28 @@ download_files() {
     echo "Arquivos baixados com sucesso!"
 }
 
-# Função para criar o botão de "Play"
-create_play_button() {
-    echo "Criando botão de 'Play'..."
+# Função para criar o comando "play"
+create_play_command() {
+    echo "Configurando o comando 'play'..."
 
-    cat > "$BASE_DIR/play.sh" <<EOF
-#!/bin/bash
+    # Adiciona o alias ao arquivo de configuração do shell
+    if [[ -f "$HOME/.bashrc" ]]; then
+        echo "alias play='cd $BASE_DIR && node leandrus.js'" >> "$HOME/.bashrc"
+    elif [[ -f "$HOME/.zshrc" ]]; then
+        echo "alias play='cd $BASE_DIR && node leandrus.js'" >> "$HOME/.zshrc"
+    else
+        echo "Nenhum arquivo de configuração do shell encontrado. Criando ~/.bashrc..."
+        echo "alias play='cd $BASE_DIR && node leandrus.js'" > "$HOME/.bashrc"
+    fi
 
-echo "Iniciando o bot..."
-cd "$BASE_DIR"
-node leandrus.js
-EOF
+    # Recarrega o shell para aplicar o alias
+    if [[ -n "$BASH" ]]; then
+        source "$HOME/.bashrc"
+    elif [[ -n "$ZSH_NAME" ]]; then
+        source "$HOME/.zshrc"
+    fi
 
-    chmod +x "$BASE_DIR/play.sh"
-    echo "Botão de 'Play' criado com sucesso!"
+    echo "Comando 'play' configurado com sucesso!"
 }
 
 # Função principal
@@ -81,12 +88,12 @@ main() {
     # Baixa arquivos
     download_files
 
-    # Cria botão de "Play"
-    create_play_button
+    # Configura o comando "play"
+    create_play_command
 
     echo "Instalação concluída com sucesso!"
-    echo "Para iniciar o bot, execute:"
-    echo "cd $BASE_DIR && ./play.sh"
+    echo "Para iniciar o bot, digite:"
+    echo "play"
 }
 
 # Executa a função principal
