@@ -24,11 +24,13 @@ if [ -d "$BOT_DIR" ]; then
     rm -rf "$BOT_DIR"
 fi
 
-# Baixa o código do bot do seu repositório
-echo "⬇️ Baixando o Leandrus..."
+# Cria o diretório do bot
 mkdir -p "$BOT_DIR"
 cd "$BOT_DIR"
-curl -o install.sh -L "https://raw.githubusercontent.com/leandoo/bot/refs/heads/main/install.sh"
+
+# Baixa o código do bot
+echo "⬇️ Baixando o Leandrus..."
+curl -o leandrus.cjs -L "https://raw.githubusercontent.com/leandoo/bot/main/leandrus.cjs"
 
 # Instala dependências do projeto
 echo "📦 Instalando dependências do Leandrus..."
@@ -38,7 +40,7 @@ npm install
 echo "⚙️ Configurando comando de execução..."
 PLAY_CMD="$PREFIX/bin/play"
 echo '#!/data/data/com.termux/files/usr/bin/sh' > "$PLAY_CMD"
-echo "cd $BOT_DIR && node leandrus.js" >> "$PLAY_CMD"
+echo "cd $BOT_DIR && node leandrus.cjs" >> "$PLAY_CMD"
 chmod +x "$PLAY_CMD"
 
 echo "✅ Instalação concluída! Execute o bot com: play"
