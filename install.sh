@@ -28,7 +28,7 @@ fi
 echo "⬇️ Baixando o Leandrus..."
 mkdir -p "$BOT_DIR"
 cd "$BOT_DIR"
-curl -o leandrus.js -L "https://raw.githubusercontent.com/leandoo/bot/main/leandrus.js"
+curl -o leandrus.js -L "https://raw.githubusercontent.com/leandoo/bot/refs/heads/main/leandrus.js"
 
 # Cria o package.json com "type": "commonjs" para evitar erro de importação
 echo '{ "type": "commonjs" }' > package.json
