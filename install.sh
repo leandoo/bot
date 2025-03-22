@@ -1,32 +1,44 @@
-#!/bin/bash
+#!/data/data/com.termux/files/usr/bin/bash
 
-# Atualizar pacotes e sistema
-echo -e "\e[32m🔄 Atualizando o sistema...\e[0m"
+# Atualiza o Termux e instala pacotes essenciais
+echo "🔄 Atualizando o sistema..."
 pkg update -y && pkg upgrade -y
 
-# Instalar dependências essenciais
-echo -e "\e[32m📦 Instalando dependências...\e[0m"
-pkg install nodejs-lts npm git curl -y
+# Instala Node.js e npm se não estiverem instalados
+echo "🛠️ Instalando Node.js e npm..."
+pkg install -y nodejs-lts
 
-# Clonar o repositório do bot
-BOT_DIR="$HOME/leandrus"
-if [ -d "$BOT_DIR" ]; then
-    echo -e "\e[33m⚠️ Diretório existente. Atualizando...\e[0m"
-    cd $BOT_DIR && git pull
-else
-    echo -e "\e[32m📥 Baixando o bot...\e[0m"
-    git clone https://github.com/leandoo/bot.git $BOT_DIR
-    cd $BOT_DIR
+# Verifica se o Node.js foi instalado corretamente
+if ! command -v node &> /dev/null
+then
+    echo "❌ Erro: Node.js não foi instalado corretamente. Tente instalar manualmente com 'pkg install nodejs-lts'."
+    exit 1
 fi
 
-# Instalar pacotes do Node.js
-echo -e "\e[32m📦 Instalando pacotes do Node.js...\e[0m"
+# Diretório do bot
+BOT_DIR="$HOME/leandrus"
+
+# Remove versão antiga do bot, se existir
+if [ -d "$BOT_DIR" ]; then
+    echo "⚠️ Removendo versão antiga do Leandrus..."
+    rm -rf "$BOT_DIR"
+fi
+
+# Baixa o código do bot do seu repositório
+echo "⬇️ Baixando o Leandrus..."
+mkdir -p "$BOT_DIR"
+cd "$BOT_DIR"
+curl -o install.sh -L "https://raw.githubusercontent.com/leandoo/bot/refs/heads/main/install.sh"
+
+# Instala dependências do projeto
+echo "📦 Instalando dependências do Leandrus..."
 npm install
 
-# Criar comando "play" para rodar o bot
-echo -e "\e[32m⚙️ Configurando comando de execução...\e[0m"
-echo "cd $BOT_DIR && node leandrus.js" > $PREFIX/bin/play
-chmod +x $PREFIX/bin/play
+# Cria o comando 'play' para executar o bot facilmente
+echo "⚙️ Configurando comando de execução..."
+PLAY_CMD="$PREFIX/bin/play"
+echo '#!/data/data/com.termux/files/usr/bin/sh' > "$PLAY_CMD"
+echo "cd $BOT_DIR && node leandrus.js" >> "$PLAY_CMD"
+chmod +x "$PLAY_CMD"
 
-# Finalização
-echo -e "\e[32m✅ Instalação concluída! Execute o bot com: play\e[0m"
+echo "✅ Instalação concluída! Execute o bot com: play"
