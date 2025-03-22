@@ -54,28 +54,20 @@ download_files() {
     echo "Arquivos baixados com sucesso!"
 }
 
-# Função para criar o comando "startbot"
-create_startbot_command() {
-    echo "Configurando o comando 'startbot'..."
+# Função para criar o script "startbot"
+create_startbot_script() {
+    echo "Criando o script 'startbot'..."
 
-    # Adiciona o alias ao arquivo de configuração do shell
-    if [[ -f "$HOME/.bashrc" ]]; then
-        echo "alias startbot='cd $BASE_DIR && node leandrus.js'" >> "$HOME/.bashrc"
-    elif [[ -f "$HOME/.zshrc" ]]; then
-        echo "alias startbot='cd $BASE_DIR && node leandrus.js'" >> "$HOME/.zshrc"
-    else
-        echo "Nenhum arquivo de configuração do shell encontrado. Criando ~/.bashrc..."
-        echo "alias startbot='cd $BASE_DIR && node leandrus.js'" > "$HOME/.bashrc"
-    fi
+    # Cria o script
+    cat > /data/data/com.termux/files/usr/bin/startbot <<EOF
+#!/bin/bash
+cd "$BASE_DIR" && node leandrus.js
+EOF
 
-    # Recarrega o shell para aplicar o alias
-    if [[ -n "$BASH" ]]; then
-        source "$HOME/.bashrc"
-    elif [[ -n "$ZSH_NAME" ]]; then
-        source "$HOME/.zshrc"
-    fi
+    # Dá permissão de execução
+    chmod +x /data/data/com.termux/files/usr/bin/startbot
 
-    echo "Comando 'startbot' configurado com sucesso!"
+    echo "Script 'startbot' criado com sucesso!"
 }
 
 # Função principal
@@ -88,8 +80,8 @@ main() {
     # Baixa arquivos
     download_files
 
-    # Configura o comando "startbot"
-    create_startbot_command
+    # Cria o script "startbot"
+    create_startbot_script
 
     echo "Instalação concluída com sucesso!"
     echo "Para iniciar o bot, digite:"
