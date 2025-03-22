@@ -1,17 +1,17 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-const fs = require("fs");
-const path = require("path");
-const os = require("os");
-const readline = require("readline");
-const express = require("express");
-const cors = require("cors");
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import fs from "fs";
+import path from "path";
+import os from "os";
+import readline from "readline";
+import express from "express";
+import cors from "cors";
 
 // Configuração da API Gemini
-const API_KEY = "AIzaSyDVj-qblGxXc3Yj2gzeLa6ZtfJergGlrlo"; // Sua API de teste do Gemini
+const API_KEY = "AIzaSyDVj-qblGxXc3Yj2gzeLa6ZtfJergGlrlo";
 const genAI = new GoogleGenerativeAI(API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-// Diretório para salvar conversas
+// Diretório de histórico de conversas
 const CHAT_DIR = path.join(os.homedir(), "Leandrus_Conversas");
 if (!fs.existsSync(CHAT_DIR)) fs.mkdirSync(CHAT_DIR);
 
@@ -20,12 +20,11 @@ function saveConversation(userInput, botResponse) {
     const timestamp = new Date().toISOString().replace(/:/g, "-");
     const filename = `Conversa_${timestamp}.txt`;
     const filePath = path.join(CHAT_DIR, filename);
-    const content = `[${new Date().toLocaleString()}]\nVocê: ${userInput}\nLeandrus: ${botResponse}\n\n`;
-    fs.writeFileSync(filePath, content, "utf-8");
+    fs.writeFileSync(filePath, `[${new Date().toLocaleString()}]\nVocê: ${userInput}\nLeandrus: ${botResponse}\n\n`, "utf-8");
     return filename;
 }
 
-// Função para exibir texto com efeito de digitação
+// Função de digitação
 async function typeWriter(text, delay = 30) {
     for (const char of text) {
         process.stdout.write(char);
@@ -34,7 +33,7 @@ async function typeWriter(text, delay = 30) {
     console.log();
 }
 
-// Exibir códigos de programação formatados
+// Exibir código formatado
 function displayCode(code) {
     console.log("\n\x1b[32mCódigo Gerado:\x1b[0m");
     console.log("\x1b[33m" + "-".repeat(50) + "\x1b[0m");
@@ -42,17 +41,16 @@ function displayCode(code) {
     console.log("\x1b[33m" + "-".repeat(50) + "\x1b[0m\n");
 }
 
-// Chamada à API Gemini Flash 2.0
+// Chamar a API Gemini
 async function callAPI(prompt) {
     try {
-        const fullPrompt = `Você é Leandrus, um assistente virtual inteligente e sarcástico:\n${prompt}`;
+        const fullPrompt = `Você é Leandrus, um assistente virtual inteligente:\n${prompt}`;
         const result = await model.generateContent(fullPrompt);
         const response = await result.response;
         const textResponse = response.text();
 
         if (textResponse.includes("```")) {
-            const code = textResponse.split("```")[1].trim();
-            displayCode(code);
+            displayCode(textResponse.split("```")[1].trim());
         } else {
             await typeWriter(`\x1b[36mLeandrus:\x1b[0m ${textResponse}`, 30);
         }
@@ -63,7 +61,7 @@ async function callAPI(prompt) {
     }
 }
 
-// Chat interativo no terminal
+// Chat interativo
 async function chatLoop() {
     const rl = readline.createInterface({
         input: process.stdin,
@@ -89,7 +87,7 @@ async function chatLoop() {
     });
 }
 
-// Servidor local para visualizar e baixar conversas
+// Servidor local
 const app = express();
 app.use(cors());
 app.use(express.static(CHAT_DIR));
@@ -109,7 +107,7 @@ app.listen(3000, () => {
     console.log("\x1b[32mServidor rodando em: http://localhost:3000\x1b[0m");
 });
 
-// Inicia o sistema
+// Inicia o chat
 (async () => {
     console.clear();
     console.log("\x1b[32mBem-vindo ao Leandrus!\x1b[0m");
